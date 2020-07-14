@@ -114,19 +114,19 @@ const main = () => {
 }
 
 const addDept = () => {
-    inquirer.prompt(deptQset).then(deptRes => {
-        console.log(deptRes);
-        connection.query("SELECT name FROM employees_db.dept WHERE name = ?", [deptRes.dept_name], function (err, res) {
+    inquirer.prompt(deptQset).then(dept_res => {
+        console.log(dept_res);
+        connection.query("SELECT name FROM employees_db.dept WHERE name = ?", [dept_res.dept_name], function (err, res) {
             if (err) throw err;
 
             if (res.length === 0) {
                 connection.query("INSERT INTO dept SET ?",
                     {
-                        name: deptRes.dept_name
+                        name: dept_res.dept_name
                     },
                     function (err, res) {
                         if (err) throw err;
-                        console.log(res.affectedRows + " dept added");
+                        console.log(res.affected_rows + " dept added");
 
                         main();
                     });
@@ -152,18 +152,18 @@ const addRole = () => {
         for (let i = 0; i < res.length; i++) {
             dept.push(res[i].name);
         }
-        inquirer.prompt(roleQset).then(roleRes => {
-            connection.query("SELECT id FROM employees_db.dept WHERE name = ?", [roleRes.role_dept], function (err, res) {
+        inquirer.prompt(roleQset).then(role_res => {
+            connection.query("SELECT id FROM employees_db.dept WHERE name = ?", [role_res.role_dept], function (err, res) {
                 if (err) throw err;
                 connection.query("INSERT INTO role SET ?",
                     {
-                        title: roleRes.role_title,
-                        salary: roleRes.role_salary,
+                        title: role_res.role_title,
+                        salary: role_res.role_salary,
                         dept_id: res[0].id
 
                     }, function (err, res) {
                         if (err) throw err;
-                        console.log(res.affectedRows + " role created!");
+                        console.log(res.affected_rows + " role created!");
                         main();
                     });
             });
@@ -180,7 +180,7 @@ const viewRole = () => {
 }
 
 const addEmployee = () => {
-    inquirer.prompt(employeeQset).then(employeeRes => {
+    inquirer.prompt(employeeQset).then(employee_res => {
         connection.query("SELECT * FROM employees_db.role", function (err, res) {
             if (err) throw err;
             for (let i = 0; i < res.length; i++) {
@@ -190,13 +190,13 @@ const addEmployee = () => {
                 {
                     type: "list",
                     message: "What is this employee's role?",
-                    name: "employeeRole",
+                    name: "employee_role",
                     choices: roles
                 }
-            ]).then(employeeRole => {
-                connection.query("SELECT id FROM employees_db.role WHERE title = ?", [employeeRole.employeeRole], function (err, res) {
+            ]).then(employee_role => {
+                connection.query("SELECT id FROM employees_db.role WHERE title = ?", [employee_role.employee_role], function (err, res) {
                     if (err) throw err;
-                    console.log(employeeRes);
+                    console.log(employee_res);
                     console.log(res);
                     let roleID = res[0].id;
                     connection.query("SELECT * FROM employees_db.employee", function (err, res) {
@@ -209,24 +209,24 @@ const addEmployee = () => {
                             {
                                 type: "list",
                                 message: "Who is this employee's manager?",
-                                name: "employeeManager",
+                                name: "employee_mgmt",
                                 choices: employees
                             }
-                        ]).then(managerName => {
-                            let nameArray = managerName.employeeManager.split(" ");
-                            let first = nameArray[0];
-                            let last = nameArray[1];
+                        ]).then(mgmt_name => {
+                            let name_arr = mgmt_name.employee_mgmt.split(" ");
+                            let first = name_arr[0];
+                            let last = name_arr[1];
                             connection.query("SELECT id FROM employees_db.employee WHERE first_name = ? AND last_name = ?", [first, last], function (err, res) {
                                 if (err) throw err;
                                 connection.query("INSERT INTO employee SET ?",
                                     {
-                                        first_name: employeeRes.first_name,
-                                        last_name: employeeRes.last_name,
+                                        first_name: employee_res.first_name,
+                                        last_name: employee_res.last_name,
                                         role_id: roleID,
                                         mgmt_id: res[0].id
                                     }, function (err, res) {
                                         if (err) throw err;
-                                        console.log(res.affectedRows + " employee created!");
+                                        console.log(res.affected_rows + " employee created!");
                                         main();
                                     });
                             });
@@ -261,8 +261,8 @@ const updateEmployee = () => {
             name: "new_role",
             choices: roles
         }
-    ]).then(newData => {
-        console.log(newData);
+    ]).then(new_data => {
+        console.log(new_data);
         main();
     });
 }
